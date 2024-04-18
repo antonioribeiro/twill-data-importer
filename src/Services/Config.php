@@ -3,8 +3,6 @@
 namespace A17\TwillDataImporter\Services;
 
 use Illuminate\Support\Arr;
-use A17\TwillDataImporter\Repositories\TwillDataImporterRepository;
-use A17\TwillDataImporter\Models\TwillDataImporter as TwillDataImporterModel;
 
 trait Config
 {

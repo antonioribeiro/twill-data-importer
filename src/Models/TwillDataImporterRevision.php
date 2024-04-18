@@ -6,5 +6,5 @@ use A17\Twill\Models\Revision;
 
 class TwillDataImporterRevision extends Revision
 {
-    protected $table = 'twill_sec_head_revisions';
+    protected $table = 'twill_data_importer_revisions';
 }

@@ -5,13 +5,15 @@ namespace A17\TwillDataImporter;
 use Illuminate\Support\Str;
 use A17\Twill\Helpers\Capsule;
 use A17\Twill\Facades\TwillCapsules;
-use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Support\Facades\Event;
 use A17\Twill\TwillPackageServiceProvider;
+use A17\TwillDataImporter\Listeners\ImportFile;
+use A17\TwillDataImporter\Events\FileWasEnqueued;
 use A17\TwillDataImporter\Services\TwillDataImporter;
 
 class ServiceProvider extends TwillPackageServiceProvider
 {
-    /** @var bool $autoRegisterCapsules */
+    /** @var bool */
     protected $autoRegisterCapsules = false;
 
     protected Capsule $capsule;
@@ -21,9 +23,7 @@ class ServiceProvider extends TwillPackageServiceProvider
         if ($this->registerConfig()) {
             $this->registerThisCapsule();
 
-            $this->configureMiddleware();
-
-            $this->registerViews();
+            $this->registerListeners();
 
             parent::boot();
         }
@@ -49,40 +49,22 @@ class ServiceProvider extends TwillPackageServiceProvider
     {
         $package = 'twill-data-importer';
 
-        $path = __DIR__ . "/config/{$package}.php";
+        $path = __DIR__ . "/config/$package.php";
 
         $this->mergeConfigFrom($path, $package);
 
         $this->publishes([
-            $path => config_path("{$package}.php"),
+            $path => config_path("$package.php"),
         ]);
 
         return !!config('twill-data-importer.enabled');
     }
 
-    public function configureMiddleware(): void
+    private function registerListeners(): void
     {
-        if (!config('twill-data-importer.middleware.inject')) {
-            return;
-        }
-
-        /**
-         * @phpstan-ignore-next-line
-         * @var \Illuminate\Foundation\Http\Kernel $kernel
-         */
-        $kernel = $this->app[Kernel::class];
-
-        foreach (config('twill-data-importer.middleware.groups', []) as $middleware) {
-            foreach ($middleware['classes'] as $class) {
-                $middleware['type'] === 'prepend'
-                    ? $kernel->prependMiddlewareToGroup($middleware['group'], $class)
-                    : $kernel->appendMiddlewareToGroup($middleware['group'], $class);
-            }
-        }
-    }
-
-    public function registerViews(): void
-    {
-        $this->loadViewsFrom(__DIR__ . '/resources/views', Str::kebab($this->capsule->getPlural()));
+        Event::listen(
+            FileWasEnqueued::class,
+            [ImportFile::class, 'handle']
+        );
     }
 }
