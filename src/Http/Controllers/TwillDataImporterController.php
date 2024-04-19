@@ -44,17 +44,17 @@ class TwillDataImporterController extends ModuleController
         $fields[] = Files::make()->name('data-files')->label('Files to import')->max(1);
 
         $fields[] = Columns::make()
-                           ->left([Input::make()->name('base_name')->label('File name')->readOnly()])
-                           ->right([Input::make()->name('mime_type')->label('File type')->readOnly()]);
+                           ->left([Input::make()->name('base_name')->label('File name')->note('(read only)')->readOnly()])
+                           ->right([Input::make()->name('mime_type')->label('File type')->note('(read only)')->readOnly()]);
 
         $fields[] = Columns::make()
-                           ->left([Input::make()->name('imported_at')->label('Imported at')->readOnly()])
-                           ->middle([Input::make()->name('imported_records')->label('Imported records')->readOnly()])
-                           ->right([Input::make()->name('total_records')->label('Total records')->readOnly()]);
+                           ->left([Input::make()->name('imported_at')->label('Imported at')->note('(read only)')->readOnly()])
+                           ->middle([Input::make()->name('imported_records')->label('Imported records')->note('(read only)')->readOnly()])
+                           ->right([Input::make()->name('total_records')->label('Total records')->note('(read only)')->readOnly()]);
 
-        $fields[] = Input::make()->name('status')->label('Current status')->readOnly();
+        $fields[] = Input::make()->name('status')->label('Current status')->note('(read only)')->readOnly();
 
-        $fields[] = Input::make()->name('error_message')->label('Last error message')->type('textarea')->rows(3)->readOnly()->connectedTo('status', 'error');
+        $fields[] = Input::make()->name('error_message')->label('Last error message')->type('textarea')->rows(3)->note('(read only)')->readOnly()->connectedTo('status', 'error');
 
         $form->addFieldset(Fieldset::make()->title('Status and configuration')->fields($fields));
 
