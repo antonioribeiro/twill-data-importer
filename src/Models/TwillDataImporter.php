@@ -44,6 +44,8 @@ class TwillDataImporter extends Model
 
     public string|null $localFile;
 
+    protected string $saved_error_message;
+
     public function revisions(): HasMany
     {
         return $this->hasMany($this->getRevisionModel(), 'twill_data_importer_id')->orderBy('created_at', 'desc');
@@ -250,7 +252,17 @@ class TwillDataImporter extends Model
 
         $this->error_message = $error;
 
+        $this->saved_error_message = $error;
+
         $this->save();
+    }
+
+    public function resetSavedErrorMessage(): void
+    {
+        /**
+         * After a transaction rollback, the error message can be reset
+         */
+        $this->error($this->saved_error_message);
     }
 
     protected function defaultImporterHasNoClassClass(): bool

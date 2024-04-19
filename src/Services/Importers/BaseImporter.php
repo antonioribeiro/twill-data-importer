@@ -3,6 +3,7 @@
 namespace A17\TwillDataImporter\Services\Importers;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use A17\TwillDataImporter\Models\TwillDataImporter;
 
 abstract class BaseImporter implements Contract
@@ -27,7 +28,17 @@ abstract class BaseImporter implements Contract
             return;
         }
 
-        $this->importFile($contents);
+        $this->beginTransaction();
+
+        if (!$this->importFile($contents)) {
+            $this->rollbackTransaction();
+
+            $this->resetSavedErrorMessage();
+
+            return;
+        }
+
+        $this->commitTransaction();
     }
 
     public function error(string $error): void
@@ -35,7 +46,12 @@ abstract class BaseImporter implements Contract
         $this->file->error($error);
     }
 
-    public function importFile(Collection $contents): void
+    public function resetSavedErrorMessage(): void
+    {
+        $this->file->resetSavedErrorMessage();
+    }
+
+    public function importFile(Collection $contents): bool
     {
         $this->file->imported_records = 0;
 
@@ -43,13 +59,15 @@ abstract class BaseImporter implements Contract
 
         foreach ($contents as $row) {
             if (!$this->importRow($row)) {
-                return;
+                return false;
             }
         }
 
         $this->file->imported_at = now();
 
         $this->file->setStatus(TwillDataImporter::IMPORTED_STATUS);
+
+        return true;
     }
 
     protected function saveTotalRecords(int $count): void
@@ -57,5 +75,20 @@ abstract class BaseImporter implements Contract
         $this->file->total_records = $count;
 
         $this->file->save();
+    }
+
+    public function beginTransaction(): void
+    {
+        DB::beginTransaction();
+    }
+
+    public function commitTransaction(): void
+    {
+        DB::commit();
+    }
+
+    public function rollbackTransaction(): void
+    {
+        DB::rollBack();
     }
 }

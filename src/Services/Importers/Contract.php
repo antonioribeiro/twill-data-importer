@@ -11,7 +11,7 @@ interface Contract
 
     public function readFile(): Collection|false;
 
-    public function importFile(Collection $contents): void;
+    public function importFile(Collection $contents): bool;
 
     public function importRow($row): bool;
 }
