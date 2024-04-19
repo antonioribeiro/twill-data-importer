@@ -12,27 +12,31 @@ use A17\TwillDataImporter\Events\FileWasEnqueued;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
+ * @property string $data_type
  * @property string|null $title
  * @property \Illuminate\Support\Carbon|null $imported_at
  * @property string|null $status
  * @property string|null $mime_type
  * @property string|null $base_name
  * @property string|null $error_message
+ * @property string|null $imported_records
+ * @property string|null $total_records
  */
 class TwillDataImporter extends Model
 {
     use HasFiles;
     use HasRevisions;
 
-    const string ENQUEUED_STATUS         = 'enqueued';
-    const string STATUS_MISSING_FILE     = 'missing-file';
+    const string ENQUEUED_STATUS = 'enqueued';
+    const string STATUS_MISSING_FILE = 'missing-file';
     const string UNSUPPORTED_FILE_STATUS = 'unsupported-file';
-    const string ERROR_STATUS            = 'error-importing-file';
-    const string IMPORTED_STATUS         = 'imported';
+    const string ERROR_STATUS = 'error';
+    const string IMPORTED_STATUS = 'imported';
+    const string FILE_IS_EMPTY_STATUS = 'file-is-empty';
 
     protected $table = 'twill_data_importer';
 
-    protected $fillable = ['title', 'status', 'success', 'imported', 'imported_at', 'imported_records', 'mime_type', 'base_name'];
+    protected $fillable = ['title', 'data_type', 'status', 'success', 'imported', 'imported_at', 'imported_records', 'total_records', 'mime_type', 'base_name'];
 
     public array $filesParams = ['data-files'];
 
@@ -45,6 +49,10 @@ class TwillDataImporter extends Model
 
     public function enqueueImport(): void
     {
+        if ($this->wasImported()) {
+            return;
+        }
+
         $this->info('Enqueuing import');
 
         $this->setStatus(self::ENQUEUED_STATUS);
@@ -60,7 +68,7 @@ class TwillDataImporter extends Model
             return;
         }
 
-        $importer = app($this->getImporters()[$this->mime_type]);
+        $importer = app($this->getImporterClass());
 
         $importer->import($this);
     }
@@ -74,6 +82,12 @@ class TwillDataImporter extends Model
 
     private function isReady(): bool
     {
+        if ($this->defaultImporterHasNoClassClass()) {
+            $this->info('Default importer has no class.');
+
+            return false;
+        }
+
         if ($this->wasImported()) {
             $this->info('Data was already imported');
 
@@ -85,6 +99,10 @@ class TwillDataImporter extends Model
 
             $this->setStatus(self::STATUS_MISSING_FILE);
 
+            return false;
+        }
+
+        if ($this->getImporterClass() === null) {
             return false;
         }
 
@@ -179,16 +197,58 @@ class TwillDataImporter extends Model
 
     private function getSupportedMimeTypes(): array
     {
-        return $this->getImporters()->keys()->toArray();
+        return $this->getMimeTypes()->keys()->toArray();
     }
 
-    private function getImporters(): Collection
+    private function getImporter(): Collection
     {
-        return collect(config('twill-data-importer.importers'));
+        return collect(config('twill-data-importer.importers')[$this->data_type] ?? []);
+    }
+
+    private function getMimeTypes(): Collection
+    {
+        return collect($this->getImporter()['mime-types'] ?? null);
     }
 
     private function getFile(): File|null
     {
         return $this->files()->first();
+    }
+
+    private function getImporterClass(): string|null
+    {
+       $class = $this->getMimeTypes()[$this->mime_type] ?? null;
+
+       if (blank($class)) {
+           $this->error('Importer class was not defined for: ' . $this->mime_type);
+
+           return null;
+       }
+
+        if (!class_exists($class)) {
+            $this->error('Importer class does not exist: ' . $class);
+
+            return null;
+        }
+
+        return $class;
+    }
+
+    public function error(string $error): void
+    {
+        $this->setStatus(TwillDataImporter::ERROR_STATUS);
+
+        $this->error_message = $error;
+
+        $this->save();
+    }
+
+    private function defaultImporterHasNoClassClass(): bool
+    {
+        if ($this->data_type === 'default' && $this->getImporterClass() === null) {
+            return true;
+        }
+
+        return false;
     }
 }

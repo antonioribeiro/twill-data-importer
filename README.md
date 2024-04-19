@@ -36,6 +36,12 @@ composer require area17/twill-data-importer
 ``` bash
 php artisan vendor:publish --provider="A17\TwillDataImporter\ServiceProvider"
 ```
+### Install dependencies
+This package depends on these other packages, in case you need
+
+| File format | Package     |
+|-------------|-------------|
+| CSV         | league/csv  |
 
 ### Usage and menu
 It's pretty straightforward, once installed you will have access to the menu option `Twill Data Importer`, which is a single page having all the supported headers that you can enable, disable and edit the properties to sent with the response.
@@ -56,7 +62,7 @@ TwillNavigation::addLink(
 
 ## Disabling
 
-This package is enabled and injects itself automatically. To disable it you just need to add to `.env`:
+In case you don't reset the menu, this package is enabled and injects itself automatically. To disable it you just need to add to `.env`:
 
 ```dotenv
 TWILL_DATA_IMPORTER_ENABLED=false

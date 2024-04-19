@@ -15,16 +15,20 @@ abstract class BaseImporter implements Contract
 
         $contents = $this->readFile();
 
+        if ($contents->isEmpty()) {
+            $this->error(TwillDataImporter::FILE_IS_EMPTY_STATUS);
+
+            return;
+        }
+
+        $this->saveTotalRecords($contents->count());
+
         $this->importFile($contents);
     }
 
     public function error(string $error): void
     {
-        $this->file->setStatus(TwillDataImporter::ERROR_STATUS);
-
-        $this->file->error_message = $error;
-
-        $this->file->save();
+        $this->file->error($error);
     }
 
     public function importFile(Collection $contents): void
@@ -38,5 +42,12 @@ abstract class BaseImporter implements Contract
         $this->file->imported_at = now();
 
         $this->file->setStatus(TwillDataImporter::IMPORTED_STATUS);
+    }
+
+    private function saveTotalRecords(int $count): void
+    {
+        $this->file->total_records = $count;
+
+        $this->file->save();
     }
 }

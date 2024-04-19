@@ -15,6 +15,8 @@ class CreateTwillDataImporterTables extends Migration
 
             $table->string('base_name')->nullable();
 
+            $table->string('data_type')->default('default');
+
             $table->string('status')->default('missing-files');
 
             $table->string('mime_type')->nullable();
@@ -24,6 +26,8 @@ class CreateTwillDataImporterTables extends Migration
             $table->text('error_message')->nullable();
 
             $table->integer('imported_records')->nullable();
+
+            $table->integer('total_records')->nullable();
 
             $table->timestamp('imported_at')->nullable();
         });

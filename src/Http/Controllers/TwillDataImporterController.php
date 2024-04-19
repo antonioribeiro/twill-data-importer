@@ -4,11 +4,13 @@ namespace A17\TwillDataImporter\Http\Controllers;
 
 use Illuminate\Support\Str;
 use A17\Twill\Services\Forms\Form;
+use A17\Twill\Services\Forms\Columns;
 use A17\Twill\Services\Forms\Fieldset;
 use A17\Twill\Services\Forms\Fields\Files;
 use A17\Twill\Services\Forms\Fields\Input;
-use A17\Twill\Services\Listings\TableColumns;
+use A17\Twill\Services\Forms\Fields\Select;
 use A17\Twill\Services\Listings\Columns\Text;
+use A17\Twill\Services\Listings\TableColumns;
 use A17\Twill\Models\Contracts\TwillModelContract;
 use A17\Twill\Http\Controllers\Admin\ModuleController;
 
@@ -29,24 +31,32 @@ class TwillDataImporterController extends ModuleController
         return Str::kebab($this->moduleName) . '::admin';
     }
 
-    private function namePrefix(): string|null
-    {
-        return config('twill.admin_route_name_prefix');
-    }
-
     public function getForm(TwillModelContract $model): Form
     {
         $form = parent::getForm($model);
 
-        $form->addFieldset(
-            Fieldset::make()
-                    ->title('Data')
-                    ->fields([
-                        Files::make()->name('data-files')->label('Files to import')->max(1),
+        $fields = [];
 
-                        Input::make()->name('error_message')->label('Last error message')->type('textarea')->rows(3)->readOnly(),
-                    ]),
-        );
+        if($this->multipleImportersAvailable()) {
+            $fields[] = $this->typeSelect();
+        }
+
+        $fields[] = Files::make()->name('data-files')->label('Files to import')->max(1);
+
+        $fields[] = Columns::make()
+                           ->left([Input::make()->name('base_name')->label('File name')->readOnly()])
+                           ->right([Input::make()->name('mime_type')->label('File type')->readOnly()]);
+
+        $fields[] = Columns::make()
+                           ->left([Input::make()->name('imported_at')->label('Imported at')->readOnly()])
+                           ->middle([Input::make()->name('imported_records')->label('Imported records')->readOnly()])
+                           ->right([Input::make()->name('total_records')->label('Total records')->readOnly()]);
+
+        $fields[] = Input::make()->name('status')->label('Current status')->readOnly();
+
+        $fields[] = Input::make()->name('error_message')->label('Last error message')->type('textarea')->rows(3)->readOnly()->connectedTo('status', 'error');
+
+        $form->addFieldset(Fieldset::make()->title('Status and configuration')->fields($fields));
 
         return $form;
     }
@@ -86,5 +96,19 @@ class TwillDataImporterController extends ModuleController
         );
 
         return $table;
+    }
+
+    public function typeSelect(): Select
+    {
+        $importers = collect(config('twill-data-importer.importers'))->mapWithKeys(function ($importer, $key) {
+            return [$key => ['value' => $key, 'label' => $importer['caption']]];
+        })->toArray();
+
+        return Select::make()->name('data_type')->options($importers);
+    }
+
+    private function multipleImportersAvailable(): bool
+    {
+        return count(config('twill-data-importer.importers')) > 1;
     }
 }
