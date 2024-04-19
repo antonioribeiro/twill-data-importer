@@ -94,7 +94,7 @@ class TwillDataImporter extends Model
             return false;
         }
 
-        if (!$this->hasFiles()) {
+        if (!$this->hasFile()) {
             $this->info('No file to import');
 
             $this->setStatus(self::STATUS_MISSING_FILE);
@@ -128,7 +128,7 @@ class TwillDataImporter extends Model
         $this->save();
     }
 
-    private function hasFiles(): bool
+    private function hasFile(): bool
     {
         $this->info('Checking if there are files to import');
 
@@ -152,18 +152,6 @@ class TwillDataImporter extends Model
 
     private function isSupportedFile(mixed $file): bool
     {
-        $this->localFile = $this->getLocalFile($file);
-
-        if (!file_exists($this->localFile)) {
-            return false;
-        }
-
-        $type = mime_content_type($this->localFile);
-
-        $this->mime_type = ($type === false ? null : $type);
-
-        $this->save();
-
         return in_array($this->mime_type, $this->getSupportedMimeTypes());
     }
 
@@ -212,7 +200,23 @@ class TwillDataImporter extends Model
 
     private function getFile(): File|null
     {
-        return $this->files()->first();
+        $file = $this->files()->first();
+
+        $this->localFile = $this->getLocalFile($file);
+
+        if (!file_exists($this->localFile)) {
+            return null;
+        }
+
+        $type = mime_content_type($this->localFile);
+
+        $this->mime_type = ($type === false ? null : $type);
+
+        $this->base_name = basename($this->localFile);
+
+        $this->save();
+
+        return $file;
     }
 
     private function getImporterClass(): string|null
@@ -220,16 +224,16 @@ class TwillDataImporter extends Model
        $class = $this->getMimeTypes()[$this->mime_type] ?? null;
 
        if (blank($class)) {
-           $this->error('Importer class was not defined for: ' . $this->mime_type);
+           $this->error("Importer class was not defined for the data type '{$this->data_type}'");
 
            return null;
        }
 
-        if (!class_exists($class)) {
+       if (!class_exists($class)) {
             $this->error('Importer class does not exist: ' . $class);
 
             return null;
-        }
+       }
 
         return $class;
     }
