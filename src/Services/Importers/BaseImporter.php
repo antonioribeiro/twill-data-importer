@@ -15,13 +15,13 @@ abstract class BaseImporter implements Contract
 
         $contents = $this->readFile();
 
+        $this->saveTotalRecords($contents->count());
+
         if ($contents->isEmpty()) {
             $this->error(TwillDataImporter::FILE_IS_EMPTY_STATUS);
 
             return;
         }
-
-        $this->saveTotalRecords($contents->count());
 
         $this->importFile($contents);
     }
@@ -33,6 +33,10 @@ abstract class BaseImporter implements Contract
 
     public function importFile(Collection $contents): void
     {
+        $this->file->imported_records = 0;
+
+        $this->file->save();
+
         foreach ($contents as $row) {
             if (!$this->importRow($row)) {
                 return;

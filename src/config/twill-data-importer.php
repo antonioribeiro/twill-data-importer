@@ -19,6 +19,7 @@ return [
 
             'mime-types' => [
                 'text/csv' => \App\Services\DataImporter\CsvImporter::class,
+                'text/plain' => \App\Services\DataImporter\CsvImporter::class,
             ],
         ],
 

@@ -30,6 +30,8 @@ class CreateTwillDataImporterTables extends Migration
             $table->integer('total_records')->nullable();
 
             $table->timestamp('imported_at')->nullable();
+
+            $table->text('headers')->nullable();
         });
 
         Schema::create('twill_data_importer_revisions', function (Blueprint $table) {

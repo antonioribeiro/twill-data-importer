@@ -8,6 +8,10 @@ trait FormSubmitOptions
 {
     public function getSubmitOptions(Model $item): ?array
     {
+        if (filled($item->imported_at)) {
+            return [];
+        }
+
         if ($this->moduleHas('revisions') && $this->enableDraftRevisions) {
             return $this->getSubmitOptionsForDraftRevisions($item);
         }

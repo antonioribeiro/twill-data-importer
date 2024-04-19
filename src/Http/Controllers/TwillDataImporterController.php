@@ -52,6 +52,8 @@ class TwillDataImporterController extends ModuleController
                            ->middle([Input::make()->name('imported_records')->label('Imported records')->note('(read only)')->readOnly()])
                            ->right([Input::make()->name('total_records')->label('Total records')->note('(read only)')->readOnly()]);
 
+        $fields[] = Input::make()->name('headers')->label('Headers on file')->type('textarea')->rows(3)->note('Headers will be transformed to snake case (read only)')->readOnly();
+
         $fields[] = Input::make()->name('status')->label('Current status')->note('(read only)')->readOnly();
 
         $fields[] = Input::make()->name('error_message')->label('Last error message')->type('textarea')->rows(3)->note('(read only)')->readOnly()->connectedTo('status', 'error');

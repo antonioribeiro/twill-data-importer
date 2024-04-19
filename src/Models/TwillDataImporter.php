@@ -4,6 +4,7 @@ namespace A17\TwillDataImporter\Models;
 
 use A17\Twill\Models\File;
 use A17\Twill\Models\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use A17\Twill\Models\Behaviors\HasFiles;
@@ -14,13 +15,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @property string $data_type
  * @property string|null $title
- * @property \Illuminate\Support\Carbon|null $imported_at
  * @property string|null $status
  * @property string|null $mime_type
  * @property string|null $base_name
  * @property string|null $error_message
- * @property string|null $imported_records
- * @property string|null $total_records
+ * @property Carbon|null $imported_at
+ * @property int|null $imported_records
+ * @property int|null $total_records
+ * @property string|null $headers
  */
 class TwillDataImporter extends Model
 {
@@ -36,7 +38,7 @@ class TwillDataImporter extends Model
 
     protected $table = 'twill_data_importer';
 
-    protected $fillable = ['title', 'data_type', 'status', 'success', 'imported', 'imported_at', 'imported_records', 'total_records', 'mime_type', 'base_name'];
+    protected $fillable = ['title', 'data_type', 'status', 'success', 'imported', 'imported_at', 'imported_records', 'total_records', 'mime_type', 'base_name', 'headers'];
 
     public array $filesParams = ['data-files'];
 
@@ -150,7 +152,7 @@ class TwillDataImporter extends Model
         return true;
     }
 
-    private function isSupportedFile(mixed $file): bool
+    private function isSupportedFile(): bool
     {
         return in_array($this->mime_type, $this->getSupportedMimeTypes());
     }
@@ -160,8 +162,12 @@ class TwillDataImporter extends Model
         \Log::info("DATA IMPORTER: $string");
     }
 
-    public function getLocalFile(File $file): string
+    public function getLocalFile(File|null $file): string|null
     {
+        if (blank($file)) {
+            return null;
+        }
+
         /** @phpstan-ignore-next-line */
         $fileName = storage_path('app/tmp/' . $file->filename);
 
@@ -224,7 +230,7 @@ class TwillDataImporter extends Model
        $class = $this->getMimeTypes()[$this->mime_type] ?? null;
 
        if (blank($class)) {
-           $this->error("Importer class was not defined for the data type '{$this->data_type}'");
+           $this->error("Importer class was not defined for the data type '$this->data_type'. Check the configuration file.");
 
            return null;
        }

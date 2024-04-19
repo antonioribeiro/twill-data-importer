@@ -5,6 +5,7 @@ namespace A17\TwillDataImporter\Services\Importers;
 use League\Csv\Reader;
 use League\Csv\Exception;
 use League\Csv\SyntaxError;
+use Illuminate\Support\Str;
 use League\Csv\UnavailableStream;
 use Illuminate\Support\Collection;
 
@@ -36,6 +37,8 @@ class CsvImporter extends BaseImporter
             return collect();
         }
 
+        $header = $this->normalizeHeader($header);
+
         $data = [];
 
         try {
@@ -54,5 +57,18 @@ class CsvImporter extends BaseImporter
     public function importRow($row): bool
     {
         return false;
+    }
+
+    private function normalizeHeader(array $header): array
+    {
+        $header = collect($header)->map(function ($value) {
+            return Str::snake(Str::replace(',', '', $value));
+        })->toArray();
+
+        $this->file->headers = implode("\n\r", $header);
+
+        $this->file->save();
+
+        return $header;
     }
 }
