@@ -11,14 +11,20 @@ use Illuminate\Support\Collection;
 
 class CsvImporter extends BaseImporter
 {
-    public function readFile(): Collection
+    public function readFile(): Collection|false
     {
+        if ($this->fileHasAnomaly()) {
+            $this->error('File has an anomalies: not the same humber of columns in all rows.');
+
+            return false;
+        }
+
         try {
             $csv = Reader::createFromPath($this->file->localFile);
         } catch (UnavailableStream) {
             $this->error('Could not read file');
 
-            return collect();
+            return false;
         }
 
         try {
@@ -26,7 +32,7 @@ class CsvImporter extends BaseImporter
         } catch (Exception) {
             $this->error('Could not process header');
 
-            return collect();
+            return false;
         }
 
         try {
@@ -34,12 +40,18 @@ class CsvImporter extends BaseImporter
         } catch (SyntaxError) {
             $this->error('Could not read header');
 
-            return collect();
+            return false;
         }
 
         $header = $this->normalizeHeader($header);
 
         $data = [];
+
+        if($this->notSameNumberOfColumns($header, $csv->getRecords())) {
+            $this->error('One or more records does not have the same number of columns as the header.');
+
+            return false;
+        }
 
         try {
             foreach ($csv->getRecords($header) as $record) {
@@ -48,7 +60,7 @@ class CsvImporter extends BaseImporter
         } catch (Exception) {
             $this->error('Data error');
 
-            return collect();
+            return false;
         }
 
         return collect($data);
@@ -59,7 +71,7 @@ class CsvImporter extends BaseImporter
         return false;
     }
 
-    private function normalizeHeader(array $header): array
+    protected function normalizeHeader(array $header): array
     {
         $header = collect($header)->map(function ($value) {
             return Str::snake(Str::replace(',', '', $value));
@@ -70,5 +82,41 @@ class CsvImporter extends BaseImporter
         $this->file->save();
 
         return $header;
+    }
+
+    protected function notSameNumberOfColumns(array $header, \Iterator $records): bool
+    {
+        $count = count($header);
+
+        foreach ($records as $record) {
+            if (count($record) !== $count) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function fileHasAnomaly(): bool
+    {
+        $file = fopen($this->file->localFile, 'r');
+
+        $header = fgetcsv($file);
+
+        $numColumns = count($header);
+
+        $hasAnomaly = false;
+
+        while (($row = fgetcsv($file)) !== false) {
+            if (count($row) !== $numColumns) {
+                $hasAnomaly = true;
+
+                break;
+            }
+        }
+
+        fclose($file);
+
+        return $hasAnomaly;
     }
 }

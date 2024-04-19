@@ -109,7 +109,7 @@ class TwillDataImporterController extends ModuleController
         return Select::make()->name('data_type')->options($importers);
     }
 
-    private function multipleImportersAvailable(): bool
+    protected function multipleImportersAvailable(): bool
     {
         return count(config('twill-data-importer.importers')) > 1;
     }

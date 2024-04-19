@@ -15,6 +15,10 @@ abstract class BaseImporter implements Contract
 
         $contents = $this->readFile();
 
+        if ($contents === false) {
+            return;
+        }
+
         $this->saveTotalRecords($contents->count());
 
         if ($contents->isEmpty()) {
@@ -48,7 +52,7 @@ abstract class BaseImporter implements Contract
         $this->file->setStatus(TwillDataImporter::IMPORTED_STATUS);
     }
 
-    private function saveTotalRecords(int $count): void
+    protected function saveTotalRecords(int $count): void
     {
         $this->file->total_records = $count;
 

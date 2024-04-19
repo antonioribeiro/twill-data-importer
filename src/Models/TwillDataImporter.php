@@ -82,7 +82,7 @@ class TwillDataImporter extends Model
         return filled($this->imported_at);
     }
 
-    private function isReady(): bool
+    protected function isReady(): bool
     {
         if ($this->defaultImporterHasNoClassClass()) {
             $this->info('Default importer has no class.');
@@ -130,14 +130,14 @@ class TwillDataImporter extends Model
         $this->save();
     }
 
-    private function hasFile(): bool
+    protected function hasFile(): bool
     {
         $this->info('Checking if there are files to import');
 
         return filled($this->getFile());
     }
 
-    private function filesAreSupported(): bool
+    protected function filesAreSupported(): bool
     {
         $file = $this->getFile();
 
@@ -152,12 +152,12 @@ class TwillDataImporter extends Model
         return true;
     }
 
-    private function isSupportedFile(): bool
+    protected function isSupportedFile(): bool
     {
         return in_array($this->mime_type, $this->getSupportedMimeTypes());
     }
 
-    private function info(mixed $string): void
+    protected function info(mixed $string): void
     {
         \Log::info("DATA IMPORTER: $string");
     }
@@ -189,22 +189,22 @@ class TwillDataImporter extends Model
         return $fileName;
     }
 
-    private function getSupportedMimeTypes(): array
+    protected function getSupportedMimeTypes(): array
     {
         return $this->getMimeTypes()->keys()->toArray();
     }
 
-    private function getImporter(): Collection
+    protected function getImporter(): Collection
     {
         return collect(config('twill-data-importer.importers')[$this->data_type] ?? []);
     }
 
-    private function getMimeTypes(): Collection
+    protected function getMimeTypes(): Collection
     {
         return collect($this->getImporter()['mime-types'] ?? null);
     }
 
-    private function getFile(): File|null
+    protected function getFile(): File|null
     {
         $file = $this->files()->first();
 
@@ -225,7 +225,7 @@ class TwillDataImporter extends Model
         return $file;
     }
 
-    private function getImporterClass(): string|null
+    protected function getImporterClass(): string|null
     {
        $class = $this->getMimeTypes()[$this->mime_type] ?? null;
 
@@ -253,7 +253,7 @@ class TwillDataImporter extends Model
         $this->save();
     }
 
-    private function defaultImporterHasNoClassClass(): bool
+    protected function defaultImporterHasNoClassClass(): bool
     {
         if ($this->data_type === 'default' && $this->getImporterClass() === null) {
             return true;

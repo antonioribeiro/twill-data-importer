@@ -9,7 +9,7 @@ interface Contract
 {
     public function import(TwillDataImporter $file): void;
 
-    public function readFile(): Collection;
+    public function readFile(): Collection|false;
 
     public function importFile(Collection $contents): void;
 

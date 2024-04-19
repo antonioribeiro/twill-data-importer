@@ -60,7 +60,7 @@ class ServiceProvider extends TwillPackageServiceProvider
         return !!config('twill-data-importer.enabled');
     }
 
-    private function registerListeners(): void
+    protected function registerListeners(): void
     {
         Event::listen(
             FileWasEnqueued::class,
