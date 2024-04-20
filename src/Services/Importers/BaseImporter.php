@@ -61,6 +61,10 @@ abstract class BaseImporter implements Contract
             if (!$this->importRow($row)) {
                 return false;
             }
+
+            $this->file->imported_records++;
+
+            $this->file->save();
         }
 
         $this->file->imported_at = now();

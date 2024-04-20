@@ -20,13 +20,13 @@ class ServiceProvider extends TwillPackageServiceProvider
 
     public function boot(): void
     {
-        if ($this->registerConfig()) {
-            $this->registerThisCapsule();
+        $this->registerConfig();
 
-            $this->registerListeners();
+        $this->registerThisCapsule();
 
-            parent::boot();
-        }
+        $this->registerListeners();
+
+        parent::boot();
     }
 
     protected function registerThisCapsule(): void
@@ -45,7 +45,7 @@ class ServiceProvider extends TwillPackageServiceProvider
         app()->singleton(TwillDataImporter::class, fn() => new TwillDataImporter());
     }
 
-    public function registerConfig(): bool
+    public function registerConfig()
     {
         $package = 'twill-data-importer';
 
@@ -56,8 +56,6 @@ class ServiceProvider extends TwillPackageServiceProvider
         $this->publishes([
             $path => config_path("$package.php"),
         ]);
-
-        return !!config('twill-data-importer.enabled');
     }
 
     protected function registerListeners(): void

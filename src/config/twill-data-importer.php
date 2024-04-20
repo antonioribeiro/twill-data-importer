@@ -1,8 +1,6 @@
 <?php
 
 return [
-    'enabled' => env('TWILL_DATA_IMPORTER_ENABLED', true),
-
     /*
      * Importers are organized by data types and mime types
      * Data type is used to define the type of data model it will import to
