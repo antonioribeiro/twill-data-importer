@@ -43,13 +43,14 @@ This package depends on these other packages, in case you need
 
 ### Usage 
 
-Create an importer class that implements one of the base importers and the `importRow()` method:
+Create an importer class that implements one of the base importers and the `importRow()` and `requiredColumns()` method:
 
 ```php
 <?php
 
 namespace App\Services\DataImporter;
 
+use Illuminate\Support\Collection;
 use App\Twill\Capsules\Artists\Models\Artist;
 use App\Twill\Capsules\Artists\Repositories\ArtistRepository;
 use A17\TwillDataImporter\Services\Importers\CsvImporter as CsvImporterBase;
@@ -63,23 +64,19 @@ class CsvImporter extends CsvImporterBase
         $this->artistRepository = app(ArtistRepository::class);
     }
 
-    /**
-     * File columns or attributes (example: Headshot Credit) are all snake cased (headshot_credit) 
-     */
     protected array $fieldRelations = [
         'name' => 'full_name',
-        'prounouns' => 'prounouns',
         'city_state' => 'city_state',
         'bio' => 'bio',
         'headshot' => 'photo_area_1',
-        'headshot_credit' => 'photo_description',
-        'headshot_image_i_d' => 'artist_photo_description',
-        'website' => 'web_site_url',
-        'social_media' => 'additional_links',
-        'practice_descriptor' => 'donor',
         'year' => 'year',
-        'initiative' => 'book_covers',
+        'sector_id' => 'book_covers',
     ];
+
+    public function requiredColumns(): Collection
+    {
+        return collect($this->fieldRelations)->keys();
+    }
 
     public function importRow($row): bool
     {
