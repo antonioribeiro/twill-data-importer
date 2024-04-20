@@ -39,9 +39,9 @@ php artisan vendor:publish --provider="A17\TwillDataImporter\ServiceProvider"
 ### Install dependencies
 This package depends on these other packages, in case you need
 
-| File format | Package     |
-|-------------|-------------|
-| CSV         | league/csv  |
+| File format | Package        |
+|-------------|----------------|
+| CSV         | [league/csv](https://github.com/thephpleague/csv) |
 
 ### Usage 
 
