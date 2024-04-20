@@ -32,17 +32,17 @@ abstract class BaseImporter implements Contract
             return;
         }
 
-        $this->beginTransaction();
+        DB::beginTransaction();
 
         if (!$this->importFile($contents)) {
-            $this->rollbackTransaction();
+            DB::rollBack();
 
             $this->resetSavedErrorMessage();
 
             return;
         }
 
-        $this->commitTransaction();
+        DB::commit();
     }
 
     public function error(string $error): void
@@ -83,21 +83,6 @@ abstract class BaseImporter implements Contract
         $this->file->total_records = $count;
 
         $this->file->save();
-    }
-
-    public function beginTransaction(): void
-    {
-        DB::beginTransaction();
-    }
-
-    public function commitTransaction(): void
-    {
-        DB::commit();
-    }
-
-    public function rollbackTransaction(): void
-    {
-        DB::rollBack();
     }
 
     protected function checkRequiredColumns(Collection $contents): bool
