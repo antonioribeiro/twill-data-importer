@@ -9,6 +9,8 @@ This Twill Capsule is intended to enable developers to create data importers (CS
 
 ![screenshot02](docs/screenshot02.png)
 
+![screenshot03](docs/screenshot02.png)
+
 ## Supported Headers
 
 
