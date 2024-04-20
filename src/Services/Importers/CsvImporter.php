@@ -47,7 +47,7 @@ class CsvImporter extends BaseImporter
 
         $data = [];
 
-        if($this->notSameNumberOfColumns($header, $csv->getRecords())) {
+        if ($this->notSameNumberOfColumns($header, $csv->getRecords())) {
             $this->error('One or more records does not have the same number of columns as the header.');
 
             return false;
@@ -73,9 +73,11 @@ class CsvImporter extends BaseImporter
 
     protected function normalizeHeader(array $header): array
     {
-        $header = collect($header)->map(function ($value) {
-            return Str::snake(Str::replace(',', '', $value));
-        })->toArray();
+        $header = collect($header)
+            ->map(function ($value) {
+                return Str::snake(Str::camel(Str::slug($value)));
+            })
+            ->toArray();
 
         $this->file->headers = implode("\n\r", $header);
 

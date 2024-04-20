@@ -29,16 +29,28 @@ class TwillDataImporter extends Model
     use HasFiles;
     use HasRevisions;
 
-    const string ENQUEUED_STATUS = 'enqueued';
-    const string STATUS_MISSING_FILE = 'missing-file';
-    const string UNSUPPORTED_FILE_STATUS = 'unsupported-file';
-    const string ERROR_STATUS = 'error';
-    const string IMPORTED_STATUS = 'imported';
-    const string FILE_IS_EMPTY_STATUS = 'file-is-empty';
+    const ENQUEUED_STATUS = 'enqueued';
+    const STATUS_MISSING_FILE = 'missing-file';
+    const UNSUPPORTED_FILE_STATUS = 'unsupported-file';
+    const ERROR_STATUS = 'error';
+    const IMPORTED_STATUS = 'imported';
+    const FILE_IS_EMPTY_STATUS = 'file-is-empty';
 
     protected $table = 'twill_data_importer';
 
-    protected $fillable = ['title', 'data_type', 'status', 'success', 'imported', 'imported_at', 'imported_records', 'total_records', 'mime_type', 'base_name', 'headers'];
+    protected $fillable = [
+        'title',
+        'data_type',
+        'status',
+        'success',
+        'imported',
+        'imported_at',
+        'imported_records',
+        'total_records',
+        'mime_type',
+        'base_name',
+        'headers',
+    ];
 
     public array $filesParams = ['data-files'];
 
@@ -218,7 +230,7 @@ class TwillDataImporter extends Model
 
         $type = mime_content_type($this->localFile);
 
-        $this->mime_type = ($type === false ? null : $type);
+        $this->mime_type = $type === false ? null : $type;
 
         $this->base_name = basename($this->localFile);
 
@@ -229,19 +241,21 @@ class TwillDataImporter extends Model
 
     protected function getImporterClass(): string|null
     {
-       $class = $this->getMimeTypes()[$this->mime_type] ?? null;
+        $class = $this->getMimeTypes()[$this->mime_type] ?? null;
 
-       if (blank($class)) {
-           $this->error("Importer class was not defined for the data type '$this->data_type'. Check the configuration file.");
+        if (blank($class)) {
+            $this->error(
+                "Importer class was not defined for the data type '$this->data_type'. Check the configuration file.",
+            );
 
-           return null;
-       }
+            return null;
+        }
 
-       if (!class_exists($class)) {
+        if (!class_exists($class)) {
             $this->error('Importer class does not exist: ' . $class);
 
             return null;
-       }
+        }
 
         return $class;
     }

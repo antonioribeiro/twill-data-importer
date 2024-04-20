@@ -60,9 +60,6 @@ class ServiceProvider extends TwillPackageServiceProvider
 
     protected function registerListeners(): void
     {
-        Event::listen(
-            FileWasEnqueued::class,
-            [ImportFile::class, 'handle']
-        );
+        Event::listen(FileWasEnqueued::class, [ImportFile::class, 'handle']);
     }
 }
