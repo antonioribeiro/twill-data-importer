@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 use League\Csv\UnavailableStream;
 use Illuminate\Support\Collection;
 
-class CsvImporter extends BaseImporter
+abstract class CsvImporter extends BaseImporter
 {
     public function readFile(): Collection|false
     {
@@ -145,4 +145,6 @@ class CsvImporter extends BaseImporter
 
         return $hasAnomaly;
     }
+
+    abstract public function requiredColumns(): Collection;
 }

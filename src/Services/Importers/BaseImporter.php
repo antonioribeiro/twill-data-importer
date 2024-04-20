@@ -20,6 +20,10 @@ abstract class BaseImporter implements Contract
             return;
         }
 
+        if (!$this->checkRequiredColumns($contents)) {
+            return;
+        }
+
         $this->saveTotalRecords($contents->count());
 
         if ($contents->isEmpty()) {
@@ -94,5 +98,18 @@ abstract class BaseImporter implements Contract
     public function rollbackTransaction(): void
     {
         DB::rollBack();
+    }
+
+    protected function checkRequiredColumns(Collection $contents): bool
+    {
+        $diff = $this->requiredColumns()->diff((new Collection($contents->first()))->keys());
+
+        if ($diff->isEmpty()) {
+            return true;
+        }
+
+        $this->error('Required headers missing from the file: ' . $diff->implode(', '));
+
+        return false;
     }
 }
