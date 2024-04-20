@@ -215,9 +215,14 @@ class TwillDataImporter extends Model
         return $this->getMimeTypes()->keys()->toArray();
     }
 
+    protected function getImporters(): Collection
+    {
+        return new Collection(config('twill-data-importer.importers'));
+    }
+
     protected function getImporter(): Collection
     {
-        return new Collection(config('twill-data-importer.importers')[$this->data_type] ?? []);
+        return new Collection($this->getImporters()[$this->data_type] ?? []);
     }
 
     protected function getMimeTypes(): Collection
@@ -253,6 +258,12 @@ class TwillDataImporter extends Model
     protected function getImporterClass(): string|null
     {
         $class = $this->getMimeTypes()[$this->mime_type] ?? null;
+
+        if (blank($this->getMimeTypes()) && $this->data_type === 'default' && count($this->getImporters()) > 1) {
+            $this->error('Data type to import not selected.');
+
+            return null;
+        }
 
         if (blank($class)) {
             $this->error(

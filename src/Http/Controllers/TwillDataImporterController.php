@@ -100,12 +100,13 @@ class TwillDataImporterController extends ModuleController
     {
         $importers = new Collection(config('twill-data-importer.importers'));
 
-        $importers = $importers->mapWithKeys(function ($importer, $key) {
+        $importers = $importers
+            ->mapWithKeys(function ($importer, $key) {
                 return [$key => ['value' => $key, 'label' => $importer['caption']]];
             })
             ->toArray();
 
-        return Select::make()->name('data_type')->options($importers);
+        return Select::make()->name('data_type')->label('Data type')->options($importers);
     }
 
     protected function multipleImportersAvailable(): bool
