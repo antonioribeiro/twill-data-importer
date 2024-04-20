@@ -185,14 +185,6 @@ TwillNavigation::addLink(
 );
 ```
 
-## Disabling
-
-In case you don't reset the menu, this package is enabled and injects itself automatically. To disable it you just need to add to `.env`:
-
-```dotenv
-TWILL_DATA_IMPORTER_ENABLED=false
-```
-
 ## Contribute
 
 Please contribute to this project by submitting pull requests.
