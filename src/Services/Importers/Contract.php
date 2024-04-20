@@ -13,5 +13,5 @@ interface Contract
 
     public function importFile(Collection $contents): bool;
 
-    public function importRow($row): bool;
+    public function importRow(array $row): bool;
 }

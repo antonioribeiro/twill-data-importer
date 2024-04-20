@@ -9,10 +9,3 @@ if (!function_exists('data_importer')) {
         return Helpers::instance();
     }
 }
-
-if (!function_exists('csp_nonce')) {
-    function csp_nonce(): string
-    {
-        return Helpers::nounce();
-    }
-}

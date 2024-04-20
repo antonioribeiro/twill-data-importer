@@ -8,6 +8,7 @@ trait FormSubmitOptions
 {
     public function getSubmitOptions(Model $item): ?array
     {
+        /** @phpstan-ignore-next-line */
         if (filled($item->imported_at)) {
             return [];
         }

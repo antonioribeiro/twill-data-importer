@@ -16,7 +16,10 @@ return [
             'caption' => 'Artists importer',
 
             'mime-types' => [
+                /** @phpstan-ignore-next-line **/
                 'text/csv' => \App\Services\DataImporter\CsvImporter::class,
+
+                /** @phpstan-ignore-next-line **/
                 'text/plain' => \App\Services\DataImporter\CsvImporter::class,
             ],
         ],
@@ -25,6 +28,7 @@ return [
             'caption' => 'Artworks Importer',
 
             'mime-types' => [
+                /** @phpstan-ignore-next-line **/
                 'application/json' => \App\Services\DataImporter\JsonImporter::class,
             ],
         ],

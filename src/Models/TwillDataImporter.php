@@ -29,12 +29,12 @@ class TwillDataImporter extends Model
     use HasFiles;
     use HasRevisions;
 
-    const ENQUEUED_STATUS = 'enqueued';
-    const STATUS_MISSING_FILE = 'missing-file';
-    const UNSUPPORTED_FILE_STATUS = 'unsupported-file';
-    const ERROR_STATUS = 'error';
-    const IMPORTED_STATUS = 'imported';
-    const FILE_IS_EMPTY_STATUS = 'file-is-empty';
+    public const ENQUEUED_STATUS = 'enqueued';
+    public const STATUS_MISSING_FILE = 'missing-file';
+    public const UNSUPPORTED_FILE_STATUS = 'unsupported-file';
+    public const ERROR_STATUS = 'error';
+    public const IMPORTED_STATUS = 'imported';
+    public const FILE_IS_EMPTY_STATUS = 'file-is-empty';
 
     protected $table = 'twill_data_importer';
 
@@ -155,7 +155,14 @@ class TwillDataImporter extends Model
     {
         $file = $this->getFile();
 
-        if (!$this->isSupportedFile($file)) {
+        if (blank($file)) {
+            $this->error('File is empty');
+
+            return false;
+        }
+
+        if (!$this->isSupportedFile()) {
+            /** @phpstan-ignore-next-line */
             $this->info('Unsupported file: ' . $file->filename);
 
             return false;
@@ -210,12 +217,12 @@ class TwillDataImporter extends Model
 
     protected function getImporter(): Collection
     {
-        return collect(config('twill-data-importer.importers')[$this->data_type] ?? []);
+        return new Collection(config('twill-data-importer.importers')[$this->data_type] ?? []);
     }
 
     protected function getMimeTypes(): Collection
     {
-        return collect($this->getImporter()['mime-types'] ?? null);
+        return new Collection($this->getImporter()['mime-types'] ?? null);
     }
 
     protected function getFile(): File|null
@@ -223,6 +230,10 @@ class TwillDataImporter extends Model
         $file = $this->files()->first();
 
         $this->localFile = $this->getLocalFile($file);
+
+        if (blank($this->localFile)) {
+            return null;
+        }
 
         if (!file_exists($this->localFile)) {
             return null;

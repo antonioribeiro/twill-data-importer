@@ -45,7 +45,7 @@ class ServiceProvider extends TwillPackageServiceProvider
         app()->singleton(TwillDataImporter::class, fn() => new TwillDataImporter());
     }
 
-    public function registerConfig()
+    public function registerConfig(): void
     {
         $package = 'twill-data-importer';
 
