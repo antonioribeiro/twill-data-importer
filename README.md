@@ -170,7 +170,7 @@ There will be no select input to chose between different types of importers in t
 
 ### Menu
 
-If you are clearing the Twill menu in order to create a new one yourself, you will need to add it manually:
+Packages are added to the main menu automatically by Twill, but if you are clearing the Twill menu in order to create one from scratch yourself, you will need to add it manually:
 
 ```php
 TwillNavigation::clear();
