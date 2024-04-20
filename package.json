@@ -15,12 +15,12 @@
     },
     "dependencies": {},
     "devDependencies": {
-        "@prettier/plugin-php": "~0.18.9",
-        "@shufo/prettier-plugin-blade": "~1.5.4",
-        "husky": "~8.0.1",
-        "lint-staged": "~13.0.3",
-        "prettier": "~2.7.1",
-        "sort-package-json": "~1.57.0"
+        "@prettier/plugin-php": "~0.22.2",
+        "@shufo/prettier-plugin-blade": "~1.14.1",
+        "husky": "~9.0.11",
+        "lint-staged": "~15.2.2",
+        "prettier": "~3.2.5",
+        "sort-package-json": "~2.10.0"
     },
     "engines": {
         "node": "~16",

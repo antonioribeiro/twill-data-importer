@@ -5,9 +5,11 @@ useTabs: false
 requirePragma: false
 insertPragma:
   false
+plugins:
+  - "@prettier/plugin-php"
 
 ### PHP
-phpVersion: "8.0"
+phpVersion: "8.2"
 trailingCommaPHP: true
 braceStyle: psr-2
 
