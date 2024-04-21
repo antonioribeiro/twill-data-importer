@@ -13,19 +13,11 @@ abstract class CsvImporter extends BaseImporter
 {
     public function readFile(): Collection|false
     {
-        if (blank($this->file->localFile)) {
-            $this->error('File was not specified.');
-
+        if ($this->file->localFile === null) {
             return false;
         }
 
-        if (!file_exists($this->file->localFile)) {
-            $this->error("File not found: $this->file->localFile");
-
-            return false;
-        }
-
-        if ($this->fileHasAnomaly()) {
+        if ($this->fileHasAnomalies()) {
             $this->error('File has an anomalies: not the same humber of columns in all rows.');
 
             return false;
@@ -78,16 +70,11 @@ abstract class CsvImporter extends BaseImporter
         return collect($data);
     }
 
-    public function importRow(array $row): bool
-    {
-        return false;
-    }
-
     protected function normalizeHeader(array $header): array
     {
         $header = collect($header)
             ->map(function ($value) {
-                return Str::snake(Str::camel(Str::slug($value)));
+                return $this->normalizeColumnName($value);
             })
             ->toArray();
 
@@ -111,7 +98,7 @@ abstract class CsvImporter extends BaseImporter
         return false;
     }
 
-    protected function fileHasAnomaly(): bool
+    protected function fileHasAnomalies(): bool
     {
         if (blank($this->file->localFile)) {
             return true;
@@ -145,6 +132,4 @@ abstract class CsvImporter extends BaseImporter
 
         return $hasAnomaly;
     }
-
-    abstract public function requiredColumns(): Collection;
 }

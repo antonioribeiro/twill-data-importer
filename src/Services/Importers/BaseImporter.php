@@ -2,6 +2,7 @@
 
 namespace A17\TwillDataImporter\Services\Importers;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use A17\TwillDataImporter\Models\TwillDataImporter;
@@ -32,27 +33,16 @@ abstract class BaseImporter implements Contract
             return;
         }
 
-        DB::beginTransaction();
-
-        if (!$this->importFile($contents)) {
-            DB::rollBack();
-
-            $this->resetSavedErrorMessage();
-
-            return;
-        }
-
-        DB::commit();
+        $this->importFile($contents);
     }
+
+    abstract public function importRow(array $row): bool;
+
+    abstract public function requiredColumns(): Collection;
 
     public function error(string $error): void
     {
         $this->file->error($error);
-    }
-
-    public function resetSavedErrorMessage(): void
-    {
-        $this->file->resetSavedErrorMessage();
     }
 
     public function importFile(Collection $contents): bool
@@ -96,5 +86,10 @@ abstract class BaseImporter implements Contract
         $this->error('Required headers missing from the file: ' . $diff->implode(', '));
 
         return false;
+    }
+
+    public function normalizeColumnName(string|null $value): string
+    {
+        return Str::snake(Str::camel(Str::slug($value ?? '')));
     }
 }
