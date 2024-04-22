@@ -4,7 +4,6 @@ This Twill Capsule is intended to enable developers to create data importers (CS
 
 ## Screenshots
 
-### CMS configuration
 ![screenshot01](docs/screenshot01.png)
 
 ![screenshot02](docs/screenshot02.png)
