@@ -202,19 +202,10 @@ namespace App\Services\DataImporter;
 
 use A17\Twill\Models\Media;
 use Illuminate\Support\Collection;
-use App\Twill\Capsules\Artists\Models\Artist;
-use App\Twill\Capsules\Artists\Repositories\ArtistRepository;
 use A17\TwillDataImporter\Services\Importers\CsvImporter as CsvImporterBase;
 
 class ImagesMetadataCsvImporter extends CsvImporterBase
 {
-    protected ArtistRepository $artistRepository;
-
-    public function __construct()
-    {
-        $this->artistRepository = app(ArtistRepository::class);
-    }
-
     protected array $fieldRelations = [
         'filename' => 'filename',
         'alt_text' => 'alt_text',
@@ -258,15 +249,6 @@ class ImagesMetadataCsvImporter extends CsvImporterBase
     private function getField(string $key): string|null
     {
         return $this->fieldRelations[$key] ?? null;
-    }
-
-    private function translate($value, Artist $artist, string $field): string|array|null
-    {
-        if (collect($artist->translatedAttributes)->contains($field)) {
-            return ['en' => $value];
-        }
-
-        return $value;
     }
 
     public function requiredColumns(): Collection
