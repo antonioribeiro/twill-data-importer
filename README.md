@@ -184,6 +184,103 @@ TwillNavigation::addLink(
 );
 ```
 
+## Update Twill Media Library metadata update 
+
+Another example of importer is to use a CSV file:
+
+```csv
+filename,alt_text,caption,credits
+filename.jpg,The alt text,The caption of your image,A possible (extra) credits metadata field
+```
+
+To update the metata of images imported in batch mode. Here's the importer code:
+
+```php
+<?php
+
+namespace App\Services\DataImporter;
+
+use A17\Twill\Models\Media;
+use Illuminate\Support\Collection;
+use App\Twill\Capsules\Artists\Models\Artist;
+use App\Twill\Capsules\Artists\Repositories\ArtistRepository;
+use A17\TwillDataImporter\Services\Importers\CsvImporter as CsvImporterBase;
+
+class ImagesMetadataCsvImporter extends CsvImporterBase
+{
+    protected ArtistRepository $artistRepository;
+
+    public function __construct()
+    {
+        $this->artistRepository = app(ArtistRepository::class);
+    }
+
+    protected array $fieldRelations = [
+        'filename' => 'filename',
+        'alt_text' => 'alt_text',
+        'caption' => 'caption',
+        'credits' => 'credits',
+    ];
+
+    public function importRow($row): bool
+    {
+        $media = null;
+
+        foreach ($row as $key => $value) {
+            $field = $this->getField($key);
+
+            if ($field === 'filename') {
+                $media = $this->findMedia($value);
+
+                if ($media === null) {
+                    break;
+                }
+
+                continue;
+            }
+
+            if ($value === null || $media === null) {
+                continue;
+            }
+
+            $media->{$field} = $value;
+        }
+
+        if ($media === null) {
+            return false;
+        }
+
+        $media->save();
+
+        return true;
+    }
+
+    private function getField(string $key): string|null
+    {
+        return $this->fieldRelations[$key] ?? null;
+    }
+
+    private function translate($value, Artist $artist, string $field): string|array|null
+    {
+        if (collect($artist->translatedAttributes)->contains($field)) {
+            return ['en' => $value];
+        }
+
+        return $value;
+    }
+
+    public function requiredColumns(): Collection
+    {
+        return collect($this->fieldRelations)->keys();
+    }
+
+    private function findMedia(mixed $value): Media|null
+    {
+        return Media::where('filename', $value)->first();
+    }
+}
+```
+
 ## Contribute
 
 Please contribute to this project by submitting pull requests.
