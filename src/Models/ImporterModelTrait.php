@@ -191,7 +191,7 @@ trait ImporterModelTrait
 
         if (blank($class)) {
             $this->error(
-                "Importer class was not defined for the data type '$this->data_type'. Check the configuration file.",
+                "Importer class was not defined for the data type '$this->data_type' and mime type '$this->mime_type'. Check the configuration file.",
             );
 
             return null;
