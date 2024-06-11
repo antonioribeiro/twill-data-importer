@@ -184,7 +184,7 @@ TwillNavigation::addLink(
 );
 ```
 
-## Update Twill Media Library metadata update 
+## Update Twill Media Library metadata 
 
 Another example of importer is to use a CSV file:
 
@@ -193,7 +193,7 @@ filename,alt_text,caption,credits
 filename.jpg,The alt text,The caption of your image,A possible (extra) credits metadata field
 ```
 
-To update the metata of images imported in batch mode. Here's the importer code:
+To update the metata of images previously imported in batch mode. Here's the importer code:
 
 ```php
 <?php
