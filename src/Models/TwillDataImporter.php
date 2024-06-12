@@ -33,6 +33,15 @@ class TwillDataImporter extends Model
     public const IMPORTED_STATUS = 'imported';
     public const FILE_IS_EMPTY_STATUS = 'file-is-empty';
 
+    public const STATUSES = [
+        self::ENQUEUED_STATUS => 'Enqueued',
+        self::STATUS_MISSING_FILE => 'Missing file',
+        self::UNSUPPORTED_FILE_STATUS => 'Unsupported file',
+        self::ERROR_STATUS => 'Error',
+        self::IMPORTED_STATUS => 'Successfully imported',
+        self::FILE_IS_EMPTY_STATUS => 'File is empty',
+    ];
+
     protected $table = 'twill_data_importer';
 
     protected $fillable = [
@@ -55,5 +64,10 @@ class TwillDataImporter extends Model
     public function revisions(): HasMany
     {
         return $this->hasMany($this->getRevisionModel(), 'twill_data_importer_id')->orderBy('created_at', 'desc');
+    }
+
+    public function getStatusForHumansAttribute(): string
+    {
+        return self::STATUSES[$this->status] ?? 'Unknown';
     }
 }
