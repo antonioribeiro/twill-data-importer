@@ -37,9 +37,9 @@ class ServiceProvider extends TwillPackageServiceProvider
             Str::afterLast($namespace, '\\'),
             $namespace,
             $this->getPackageDirectory() . '/src',
-            // null, // singular   ------------ Not available on Twill yet
-            // true, // enabled   ------------ Not available on Twill yet
-            // false, // automatic navigation   ------------ Not available on Twill yet
+            null, // singular
+            true, // enabled
+            false, // automatic navigation
         );
 
         app()->singleton(TwillDataImporter::class, fn() => new TwillDataImporter());
