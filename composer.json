@@ -1,6 +1,6 @@
 {
   "name": "area17/twill-data-importer",
-  "description": "A Twill Capsule to add and handle Data Importer",
+  "description": "A Twill Capsule to handle data import and migration from files or services",
   "homepage": "https://github.com/area17/twill-data-importer",
   "license": "Apache-2.0",
   "require": {
