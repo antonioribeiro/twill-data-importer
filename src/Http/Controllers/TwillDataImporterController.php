@@ -71,7 +71,7 @@ class TwillDataImporterController extends ModuleController
                         ->note('Headers will be transformed to snake case')
                         ->readOnly(),
 
-                    Input::make()->name('status_for_humans')->label('Current status')->readOnly(),
+                    Input::make()->name('status')->label('Current status')->readOnly(),
 
                     Input::make()
                         ->name('error_message')

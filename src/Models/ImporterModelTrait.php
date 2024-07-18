@@ -210,7 +210,7 @@ trait ImporterModelTrait
     {
         $this->setStatus(TwillDataImporter::ERROR_STATUS);
 
-        $this->error_message = $error;
+        $this->error_message = $error . "\n\n" . $this->error_message;
 
         $this->save();
     }

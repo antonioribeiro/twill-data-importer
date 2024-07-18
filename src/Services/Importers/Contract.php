@@ -16,4 +16,6 @@ interface Contract
     public function importRow(array $row): bool;
 
     public function requiredColumns(): Collection;
+
+    public function validateRow(array $row): array;
 }
