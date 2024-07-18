@@ -29,6 +29,12 @@ class TwillDataImporterRepository extends ModuleRepository
     {
         parent::afterSave($model, $fields);
 
+        if ($fields['clear_log'] ?? false) {
+            $model->error_message = null;
+
+            $model->save();
+        }
+
         $model->enqueueImport();
     }
 }

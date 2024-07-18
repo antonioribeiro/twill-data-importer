@@ -32,6 +32,7 @@ class TwillDataImporter extends Model
     public const ERROR_STATUS = 'error';
     public const IMPORTED_STATUS = 'imported';
     public const FILE_IS_EMPTY_STATUS = 'file-is-empty';
+    public const VALIDATION_ERROR_STATUS = 'validation-error';
 
     public const STATUSES = [
         self::ENQUEUED_STATUS => 'Enqueued',

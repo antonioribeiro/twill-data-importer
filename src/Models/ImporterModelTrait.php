@@ -206,13 +206,24 @@ trait ImporterModelTrait
         return $class;
     }
 
-    public function error(string $error): void
+    public function error(string|array $error): void
     {
+        if (is_array($error)) {
+            $error = implode("\n", $error);
+        }
+
         $this->setStatus(TwillDataImporter::ERROR_STATUS);
 
-        $startedAt = '---' . ((string) now()) . ' ----------------------------------------';
+        $startedAt = '--- ' . ((string) now()) . ' ----------------------------------------------------------------';
 
-        $this->error_message = $error . "\n\n" . $this->error_message;
+        $this->error_message = $startedAt . "\n\n" . $error . "\n\n" . $this->error_message;
+
+        $this->save();
+    }
+
+    public function errorStatus(string $status): void
+    {
+        $this->setStatus($status);
 
         $this->save();
     }

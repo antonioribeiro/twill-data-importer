@@ -11,7 +11,7 @@ abstract class BaseImporter implements Contract
 {
     protected TwillDataImporter $file;
 
-    protected Collection|null $errors = null;
+    protected Collection $errors;
 
     public function __construct()
     {
@@ -33,6 +33,10 @@ abstract class BaseImporter implements Contract
         }
 
         if (!$this->validateContents($contents)) {
+            $this->error($this->errors->toArray());
+
+            $this->errorStatus(TwillDataImporter::VALIDATION_ERROR_STATUS);
+
             return;
         }
 
@@ -45,15 +49,22 @@ abstract class BaseImporter implements Contract
         }
 
         $this->importFile($contents);
+
+        $this->error('Imported sucessfully.');
     }
 
     abstract public function importRow(array $row): bool;
 
     abstract public function requiredColumns(): Collection;
 
-    public function error(string $error): void
+    public function error(string|array $error): void
     {
         $this->file->error($error);
+    }
+
+    public function errorStatus(string $status): void
+    {
+        $this->file->errorStatus($status);
     }
 
     public function importFile(Collection $contents): bool
@@ -104,15 +115,7 @@ abstract class BaseImporter implements Contract
         $isValid = true;
 
         foreach ($contents as $row) {
-            $validation = $this->validateRow($row);
-
-            if (!$validation['valid']) {
-                foreach ($validation['errors'] as $error) {
-                    $this->error($error);
-                }
-
-                $isValid = false;
-            }
+            $isValid = $isValid && $this->validateRow($row)['valid'];
         }
 
         return $isValid;

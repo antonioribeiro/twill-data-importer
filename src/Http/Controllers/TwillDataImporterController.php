@@ -12,6 +12,7 @@ use A17\Twill\Services\Forms\Fields\Input;
 use A17\Twill\Services\Forms\Fields\Select;
 use A17\Twill\Services\Listings\Columns\Text;
 use A17\Twill\Services\Listings\TableColumns;
+use A17\Twill\Services\Forms\Fields\Checkbox;
 use A17\Twill\Models\Contracts\TwillModelContract;
 use A17\Twill\Http\Controllers\Admin\ModuleController;
 
@@ -75,11 +76,17 @@ class TwillDataImporterController extends ModuleController
 
                     Input::make()
                         ->name('error_message')
-                        ->label('Last error message')
+                        ->label('Import log')
                         ->type('textarea')
                         ->rows(3)
                         ->readOnly()
-                        ->connectedTo('status', 'error'),
+                        ->connectedTo('status', ['error', 'validation-error']),
+
+                    Checkbox::make()
+                        ->name('clear_log')
+                        ->label('Clear log on next update')
+                        ->default(false)
+                        ->connectedTo('status', ['error', 'validation-error']),
                 ]),
         );
 
