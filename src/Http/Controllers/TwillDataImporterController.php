@@ -82,19 +82,9 @@ class TwillDataImporterController extends ModuleController
             Fieldset::make()
                 ->title('Report log (read only)')
                 ->fields([
-                    Input::make()
-                        ->name('error_message')
-                        ->label('Import log')
-                        ->type('textarea')
-                        ->rows(3)
-                        ->readOnly()
-                        ->connectedTo('status', ['error', 'validation-error']),
+                    Input::make()->name('error_message')->label('Import log')->type('textarea')->rows(3)->readOnly(),
 
-                    Checkbox::make()
-                        ->name('clear_log')
-                        ->label('Clear log on next update')
-                        ->default(false)
-                        ->connectedTo('status', ['error', 'validation-error']),
+                    Checkbox::make()->name('clear_log')->label('Clear log on next update')->default(false),
                 ]),
         );
 
