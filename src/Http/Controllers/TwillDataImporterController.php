@@ -34,6 +34,13 @@ class TwillDataImporterController extends ModuleController
         return Str::kebab($this->moduleName) . '::admin';
     }
 
+    protected function formData($request)
+    {
+        $formData = parent::formData($request);
+
+        return array_merge(['reloadOnSuccess' => true], $formData);
+    }
+
     public function getForm(TwillModelContract $model): Form
     {
         $form = parent::getForm($model);

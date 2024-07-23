@@ -77,7 +77,7 @@ class TwillDataImporter extends Model
     public function getCanBeEditedAttribute(): bool
     {
         if ($this->status === null) {
-            return false;
+            return true;
         }
 
         return collect([
