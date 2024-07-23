@@ -4,6 +4,7 @@ namespace A17\TwillDataImporter\Repositories;
 
 use A17\Twill\Repositories\ModuleRepository;
 use A17\Twill\Repositories\Behaviors\HandleFiles;
+use A17\Twill\Models\Contracts\TwillModelContract;
 use A17\Twill\Repositories\Behaviors\HandleRevisions;
 use A17\TwillDataImporter\Models\TwillDataImporter;
 
@@ -18,6 +19,15 @@ class TwillDataImporterRepository extends ModuleRepository
     public function __construct(TwillDataImporter $model)
     {
         $this->model = $model;
+    }
+
+    public function beforeSave(TwillModelContract $object, array $fields): void
+    {
+        if (!isset($object->canBeEdited) || !$object->canBeEdited) {
+            throw new \Exception('This import is locked and cannot be edited.');
+        }
+
+        parent::beforeSave($object, $fields);
     }
 
     /**

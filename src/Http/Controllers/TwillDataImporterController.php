@@ -14,6 +14,7 @@ use A17\Twill\Services\Listings\Columns\Text;
 use A17\Twill\Services\Listings\TableColumns;
 use A17\Twill\Services\Forms\Fields\Checkbox;
 use A17\Twill\Models\Contracts\TwillModelContract;
+use A17\TwillDataImporter\Models\TwillDataImporter;
 use A17\Twill\Http\Controllers\Admin\ModuleController;
 
 class TwillDataImporterController extends ModuleController
@@ -36,6 +37,8 @@ class TwillDataImporterController extends ModuleController
     public function getForm(TwillModelContract $model): Form
     {
         $form = parent::getForm($model);
+
+        $wasImported = isset($model->status) && $model->status === TwillDataImporter::IMPORTED_STATUS;
 
         // Fieldset configuration
 
@@ -78,14 +81,17 @@ class TwillDataImporterController extends ModuleController
 
         // Fieldset log
 
+        $checkbox = !$wasImported
+            ? [Checkbox::make()->name('clear_log')->label('Clear log on next update')->default(false)]
+            : [];
+
         $form->addFieldset(
             Fieldset::make()
                 ->title('Report log (read only)')
-                ->fields([
-                    Input::make()->name('error_message')->label('Import log')->type('textarea')->rows(3)->readOnly(),
-
-                    Checkbox::make()->name('clear_log')->label('Clear log on next update')->default(false),
-                ]),
+                ->fields(
+                    [Input::make()->name('error_message')->label('Import log')->type('textarea')->rows(3)->readOnly()] +
+                        $checkbox,
+                ),
         );
 
         return $form;

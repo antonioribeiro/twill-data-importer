@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $imported_records
  * @property int|null $total_records
  * @property string|null $headers
+ * @property bool $canBeEdited
  */
 class TwillDataImporter extends Model
 {
@@ -71,5 +72,20 @@ class TwillDataImporter extends Model
     public function getStatusForHumansAttribute(): string
     {
         return self::STATUSES[$this->status] ?? 'Unknown';
+    }
+
+    public function getCanBeEditedAttribute(): bool
+    {
+        if ($this->status === null) {
+            return false;
+        }
+
+        return collect([
+            self::STATUS_MISSING_FILE,
+            self::UNSUPPORTED_FILE_STATUS,
+            self::ERROR_STATUS,
+            self::FILE_IS_EMPTY_STATUS,
+            self::VALIDATION_ERROR_STATUS,
+        ])->contains($this->status);
     }
 }
