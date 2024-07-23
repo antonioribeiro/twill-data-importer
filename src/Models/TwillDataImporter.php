@@ -27,10 +27,11 @@ class TwillDataImporter extends Model
     use ImporterModelTrait;
 
     public const ENQUEUED_STATUS = 'enqueued';
+    public const RUNNING_STATUS = 'running';
+    public const IMPORTED_STATUS = 'imported';
     public const STATUS_MISSING_FILE = 'missing-file';
     public const UNSUPPORTED_FILE_STATUS = 'unsupported-file';
     public const ERROR_STATUS = 'error';
-    public const IMPORTED_STATUS = 'imported';
     public const FILE_IS_EMPTY_STATUS = 'file-is-empty';
     public const VALIDATION_ERROR_STATUS = 'validation-error';
 

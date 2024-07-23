@@ -73,7 +73,15 @@ class TwillDataImporterController extends ModuleController
                         ->readOnly(),
 
                     Input::make()->name('status')->label('Current status')->readOnly(),
+                ]),
+        );
 
+        // Fieldset log
+
+        $form->addFieldset(
+            Fieldset::make()
+                ->title('Report log (read only)')
+                ->fields([
                     Input::make()
                         ->name('error_message')
                         ->label('Import log')

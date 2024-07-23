@@ -22,6 +22,8 @@ abstract class BaseImporter implements Contract
     {
         $this->file = $file;
 
+        $this->file->setStatus(TwillDataImporter::RUNNING_STATUS);
+
         $contents = $this->readFile();
 
         if ($contents === false) {
