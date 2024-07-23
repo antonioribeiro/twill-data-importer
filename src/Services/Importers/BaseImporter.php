@@ -53,6 +53,8 @@ abstract class BaseImporter implements Contract
         $this->importFile($contents);
 
         $this->error('Imported sucessfully.');
+
+        $this->file->setStatus(TwillDataImporter::IMPORTED_STATUS);
     }
 
     abstract public function importRow(array $row): bool;
