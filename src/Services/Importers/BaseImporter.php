@@ -119,7 +119,9 @@ abstract class BaseImporter implements Contract
         $isValid = true;
 
         foreach ($contents as $row) {
-            $isValid = $isValid && $this->validateRow($row)['valid'];
+            $lastRowValidation = $this->validateRow($row)['valid'];
+
+            $isValid = $isValid && $lastRowValidation;
         }
 
         return $isValid;
