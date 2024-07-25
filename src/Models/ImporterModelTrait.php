@@ -43,15 +43,15 @@ trait ImporterModelTrait
 
     protected function isReady(): bool
     {
+        if (!$this->hasFile()) {
+            return false;
+        }
+
         if ($this->defaultImporterHasNoClassClass()) {
             return false;
         }
 
         if ($this->wasImported()) {
-            return false;
-        }
-
-        if (!$this->hasFile()) {
             return false;
         }
 
@@ -141,7 +141,19 @@ trait ImporterModelTrait
 
     protected function getImporter(): Collection
     {
-        return new Collection($this->getImporters()[$this->data_type] ?? []);
+        $importers = $this->getImporters();
+
+        $importer = $importers[$this->data_type] ?? [];
+
+        if ($importer === [] && count($this->getImporters()) === 1 && $this->data_type === 'default') {
+            $importer = $importers->first();
+        } else {
+            $this->error(
+                "Importer was not defined for the data type '$this->data_type'. Check the configuration file.",
+            );
+        }
+
+        return new Collection($importer);
     }
 
     protected function getMimeTypes(): Collection

@@ -17,12 +17,6 @@ abstract class CsvImporter extends BaseImporter
             return false;
         }
 
-        if ($this->fileHasAnomalies()) {
-            $this->error('File has an anomalies: not the same humber of columns in all rows.');
-
-            return false;
-        }
-
         try {
             $csv = Reader::createFromPath($this->file->localFile);
         } catch (UnavailableStream) {
@@ -67,6 +61,12 @@ abstract class CsvImporter extends BaseImporter
             return false;
         }
 
+        if ($this->fileHasAnomalies($header, $data)) {
+            $this->error('File has an anomalies: not the same humber of columns in all rows.');
+
+            return false;
+        }
+
         return collect($data);
     }
 
@@ -98,37 +98,27 @@ abstract class CsvImporter extends BaseImporter
         return false;
     }
 
-    protected function fileHasAnomalies(): bool
+    protected function fileHasAnomalies(array $header, array $data): bool
     {
         if (blank($this->file->localFile)) {
-            return true;
+            return false;
         }
 
-        $file = fopen($this->file->localFile, 'r');
-
-        if ($file === false) {
-            return true;
-        }
-
-        $header = fgetcsv($file);
-
-        if (!is_countable($header)) {
-            return true;
-        }
-
-        $numColumns = count($header);
+        $csv = Reader::createFromPath($this->file->localFile);
 
         $hasAnomaly = false;
 
-        while (($row = fgetcsv($file)) !== false) {
-            if (count($row) !== $numColumns) {
+        foreach ($csv->getRecords() as $record) {
+            $numColumns = count($record);
+
+            $numColumnsHeader ??= $numColumns;
+
+            if ($numColumns !== $numColumnsHeader) {
                 $hasAnomaly = true;
 
                 break;
             }
         }
-
-        fclose($file);
 
         return $hasAnomaly;
     }
