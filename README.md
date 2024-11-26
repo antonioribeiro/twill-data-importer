@@ -179,7 +179,8 @@ TwillNavigation::clear();
 
 TwillNavigation::addLink(
     NavigationLink::make()
-        ->forModule('TwillDataImporter')
+        ->addModuleNameException('twillDataImporter')
+        ->forModule('twillDataImporter')
         ->title('Data importer')
 );
 ```
