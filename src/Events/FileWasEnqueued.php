@@ -3,11 +3,12 @@
 namespace A17\TwillDataImporter\Events;
 
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use A17\TwillDataImporter\Models\TwillDataImporter;
 
-class FileWasEnqueued
+class FileWasEnqueued implements ShouldQueue
 {
     use Dispatchable;
     use SerializesModels;
