@@ -3,6 +3,7 @@
 namespace A17\TwillDataImporter\Http\Controllers;
 
 use Illuminate\Database\Eloquent\Model;
+use A17\TwillDataImporter\Models\TwillDataImporter;
 
 trait FormSubmitOptions
 {

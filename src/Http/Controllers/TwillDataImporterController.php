@@ -45,10 +45,6 @@ class TwillDataImporterController extends ModuleController
     {
         $form = parent::getForm($model);
 
-        $wasImported = isset($model->status) && $model->status === TwillDataImporter::IMPORTED_STATUS;
-
-        // Fieldset configuration
-
         $fields = [];
 
         if ($this->multipleImportersAvailable()) {
@@ -88,7 +84,7 @@ class TwillDataImporterController extends ModuleController
 
         // Fieldset log
 
-        $checkbox = !$wasImported
+        $checkbox = !$model->wasImported
             ? [Checkbox::make()->name('clear_log')->label('Clear log on next update')->default(false)]
             : [];
 

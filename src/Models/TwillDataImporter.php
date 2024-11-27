@@ -35,6 +35,7 @@ class TwillDataImporter extends Model
     public const ERROR_STATUS = 'error';
     public const FILE_IS_EMPTY_STATUS = 'file-is-empty';
     public const VALIDATION_ERROR_STATUS = 'validation-error';
+    public const ZERO_RECORDS_IMPORTED_STATUS = 'zero-records-imported';
 
     public const STATUSES = [
         self::ENQUEUED_STATUS => 'Enqueued',
@@ -43,6 +44,7 @@ class TwillDataImporter extends Model
         self::ERROR_STATUS => 'Error',
         self::IMPORTED_STATUS => 'Successfully imported',
         self::FILE_IS_EMPTY_STATUS => 'File is empty',
+        self::ZERO_RECORDS_IMPORTED_STATUS => 'Zero records imported',
     ];
 
     protected $table = 'twill_data_importer';
@@ -76,16 +78,11 @@ class TwillDataImporter extends Model
 
     public function getCanBeEditedAttribute(): bool
     {
-        if ($this->status === null) {
-            return true;
-        }
+        return !$this->wasImported;
+    }
 
-        return collect([
-            self::STATUS_MISSING_FILE,
-            self::UNSUPPORTED_FILE_STATUS,
-            self::ERROR_STATUS,
-            self::FILE_IS_EMPTY_STATUS,
-            self::VALIDATION_ERROR_STATUS,
-        ])->contains($this->status);
+    public function getWasImportedAttribute(): bool
+    {
+        return isset($this->status) && $this->status === TwillDataImporter::IMPORTED_STATUS && $this->imported_at !== null && $this->imported_records > 0;
     }
 }

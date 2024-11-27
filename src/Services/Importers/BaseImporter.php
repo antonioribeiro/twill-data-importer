@@ -42,6 +42,12 @@ abstract class BaseImporter implements Contract
             return;
         }
 
+        if ($contents->count() === 0) {
+            $this->error(TwillDataImporter::ZERO_RECORDS_IMPORTED_STATUS);
+
+            return;
+        }
+
         $this->saveTotalRecords($contents->count());
 
         if ($contents->isEmpty()) {

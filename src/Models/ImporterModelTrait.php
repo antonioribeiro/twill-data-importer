@@ -16,7 +16,7 @@ trait ImporterModelTrait
 
     public function enqueueImport(): void
     {
-        if ($this->wasImported()) {
+        if ($this->wasImported) {
             return;
         }
 
@@ -36,11 +36,6 @@ trait ImporterModelTrait
         $importer->import($this);
     }
 
-    public function wasImported(): bool
-    {
-        return filled($this->imported_at);
-    }
-
     protected function isReady(): bool
     {
         if (!$this->hasFile()) {
@@ -51,7 +46,7 @@ trait ImporterModelTrait
             return false;
         }
 
-        if ($this->wasImported()) {
+        if ($this->wasImported) {
             return false;
         }
 
@@ -139,26 +134,36 @@ trait ImporterModelTrait
         return new Collection(config('twill-data-importer.importers'));
     }
 
-    protected function getImporter(): Collection
+    protected function getImporter(): Collection|null
     {
         $importers = $this->getImporters();
 
         $importer = $importers[$this->data_type] ?? [];
 
-        if ($importer === [] && count($this->getImporters()) === 1 && $this->data_type === 'default') {
-            $importer = $importers->first();
-        } else {
-            $this->error(
-                "Importer was not defined for the data type '$this->data_type'. Check the configuration file.",
-            );
+        if (blank($importer)) {
+            if (count($importers) === 1 && $this->data_type === 'default') {
+                $importer = $importers->first();
+            } else {
+                $this->error(
+                    "Importer was not defined for the data type '$this->data_type'. Check the configuration file.",
+                );
+
+                return null;
+            }
         }
 
         return new Collection($importer);
     }
 
-    protected function getMimeTypes(): Collection
+    protected function getMimeTypes(): Collection|null
     {
-        return new Collection($this->getImporter()['mime-types'] ?? null);
+        $importer = $this->getImporter()['mime-types'] ?? null;
+
+        if (blank($importer)) {
+            return null;
+        }
+
+        return new Collection($importer);
     }
 
     protected function getFile(): File|null
