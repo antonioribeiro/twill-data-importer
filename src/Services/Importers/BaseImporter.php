@@ -135,7 +135,18 @@ abstract class BaseImporter implements Contract
 
     public function normalizeColumnName(string|null $value): string
     {
+        $string = Str::lower($value);
+
+        if ($this->isSnakeCase($string)) {
+            return $string;
+        }
+
         return Str::snake(Str::camel(Str::slug($value ?? '')));
+    }
+
+    function isSnakeCase(string $string): bool
+    {
+        return (bool) preg_match('/^_*[a-z0-9]+(_[a-z0-9]+)*$/', $string);
     }
 
     public function validateRow(array $row): array
