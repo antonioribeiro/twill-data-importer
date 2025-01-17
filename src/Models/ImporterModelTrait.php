@@ -185,7 +185,7 @@ trait ImporterModelTrait
             return null;
         }
 
-        $type = mime_content_type($this->localFile);
+        $type = $this->getMimeType($this->localFile);
 
         $this->mime_type = $type === false ? null : $type;
 
@@ -252,5 +252,31 @@ trait ImporterModelTrait
         }
 
         return false;
+    }
+
+    protected function getMimeType(string $file): string
+    {
+        $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+
+        $mime_types = [
+            'json' => 'application/json',
+            'yml' => 'application/yaml',
+            'yaml' => 'application/yaml',
+            'csv' => 'text/csv',
+            'txt' => 'text/plain',
+            'html' => 'text/html',
+        ];
+
+        if (isset($mime_types[$extension])) {
+            return $mime_types[$extension];
+        }
+
+        $type = mime_content_type($file);
+
+        if ($type === false) {
+            $type = 'application/octet-stream'; // Generic binary type
+        }
+
+        return $type;
     }
 }

@@ -100,6 +100,21 @@ class TwillDataImporterController extends ModuleController
         return $form;
     }
 
+    public function getSideFieldsets(TwillModelContract $model): Form
+    {
+        $sidebar = parent::getForm($model);
+
+        $sidebar->addFieldset(
+            Fieldset::make()
+                    ->title('Options')
+                    ->fields([
+                        Checkbox::make()->name('clear_log')->label('Clear log'),
+                    ]),
+        );
+
+        return $sidebar;
+    }
+
     protected function additionalIndexTableColumns(): TableColumns
     {
         $table = parent::additionalIndexTableColumns();
