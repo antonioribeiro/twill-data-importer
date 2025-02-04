@@ -81,7 +81,7 @@ trait FormSubmitOptions
             'update' => [
                 [
                     'name' => 'update',
-                    'text' => 'Update and import',
+                    'text' => 'Update',
                 ],
             ],
         ];

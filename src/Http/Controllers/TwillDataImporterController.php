@@ -109,6 +109,8 @@ class TwillDataImporterController extends ModuleController
                     ->title('Options')
                     ->fields([
                         Checkbox::make()->name('clear_log')->label('Clear log'),
+
+                        Checkbox::make()->name('import_after_update')->label("Import after update"),
                     ]),
         );
 

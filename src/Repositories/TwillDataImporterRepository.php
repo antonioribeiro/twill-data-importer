@@ -45,6 +45,8 @@ class TwillDataImporterRepository extends ModuleRepository
             $model->save();
         }
 
-        $model->enqueueImport();
+        if ($fields['import_after_update'] ?? false) {
+            $model->enqueueImport();
+        }
     }
 }
