@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $total_records
  * @property string|null $headers
  * @property bool $canBeEdited
+ * @property bool $wasImported
  */
 class TwillDataImporter extends Model
 {
@@ -27,6 +28,7 @@ class TwillDataImporter extends Model
     use HasRevisions;
     use ImporterModelTrait;
 
+    public const RESET_STATUS = 'reset';
     public const ENQUEUED_STATUS = 'enqueued';
     public const RUNNING_STATUS = 'running';
     public const IMPORTED_STATUS = 'imported';
@@ -84,5 +86,18 @@ class TwillDataImporter extends Model
     public function getWasImportedAttribute(): bool
     {
         return isset($this->status) && $this->status === TwillDataImporter::IMPORTED_STATUS && $this->imported_at !== null && $this->imported_records > 0;
+    }
+
+    public function resetImportStatus(): void
+    {
+        $this->status = TwillDataImporter::RESET_STATUS;
+
+        $this->imported_at = null;
+
+        $this->imported_records = 0;
+
+        $this->error_message = null;
+
+        $this->save();
     }
 }
