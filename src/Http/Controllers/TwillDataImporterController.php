@@ -121,6 +121,8 @@ class TwillDataImporterController extends ModuleController
     {
         $table = parent::additionalIndexTableColumns();
 
+        $table->push(Text::make()->field('id')->title('ID'));
+
         $table->push(Text::make()->field('base_name')->title('File name'));
 
         $table->push(Text::make()->field('mime_type')->title('File type'));
