@@ -68,6 +68,8 @@ class TwillDataImporter extends Model
 
     public array $filesParams = ['data-files'];
 
+    protected bool $force = false;
+
     public function revisions(): HasMany
     {
         return $this->hasMany($this->getRevisionModel(), 'twill_data_importer_id')->orderBy('created_at', 'desc');
@@ -99,5 +101,12 @@ class TwillDataImporter extends Model
         $this->error_message = null;
 
         $this->save();
+    }
+
+    public function setForce(bool $force): self
+    {
+        $this->force = $force;
+
+        return $this;
     }
 }
