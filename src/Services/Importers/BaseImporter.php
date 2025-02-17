@@ -84,6 +84,8 @@ abstract class BaseImporter implements Contract
         $this->file->save();
 
         foreach ($contents as $row) {
+            $this->logRow($row);
+
             if (!$this->importRow($row)) {
                 return false;
             }
@@ -156,5 +158,10 @@ abstract class BaseImporter implements Contract
 
             'errors' => [],
         ];
+    }
+
+    public function logRow(array $row): void
+    {
+    
     }
 }
